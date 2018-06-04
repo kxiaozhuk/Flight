@@ -10,14 +10,24 @@
 
 # 合约使用
 
-apply：创建保单
-get：查询保单
-len：统计保单数
-getAccount：获取帐户
-getByAccount：根据帐户获取内保单
-claim：理赔
-check：核赔
-set／getRate：设置获取赔付率
-transfer：转账
-isAdmin：判断是否管理员
-getByStatus：根据状态获取保单
+* apply：创建保单(key：保单号, flight：航班号, planStart：计划起飞时间, planEnd：计划到达时间, from：出发点, to：落地点, remarks：备注)
+
+* get：根据保单号查询保单
+
+* len：统计保单数
+
+* getAccount：获取帐户
+
+* getByAccount：根据帐户获取内保单列表（帐户为用户钱包地址）
+
+* claim：输入保单号以申请理赔
+
+* check：核赔，输入实际起飞时间和到达时间，根据计划和实际起飞时间是否超过3小时来决定是否理赔
+
+* set／getRate：设置获取赔付率，赔付率=保额／保费
+
+* transfer：转账
+
+* isAdmin：判断是否管理员
+
+* getByStatus：根据状态获取保单列表

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+    <title>Flight</title>
+    <link rel="stylesheet" href="lib/bootstrap-4.0.0-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/datepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="lib/footable/css/footable.bootstrap.min.css">
+    <link rel="stylesheet" href="lib/select2/css/select2.min.css">
+    <link rel="icon" href="flight.ico">
+    <style>
+    .hide {
+        display: none;
+    }
+    /*    .footer {
+        left: 0px;
+        position: fixed;
+        width: 100%;
+        height: 40px;
+        text-align: center;
+        bottom: 0px;
+    }*/
+
+    .card {
+        margin-top: 10px;
+        margin-left: 10px;
+        margin-right: 10px;
+        /*height: 600px;*/
+        /*background-image: url(img/flight2.jpg);*/
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+
+    .card-header {
+        margin-left: 2px;
+    }
+    </style>
+</head>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
+    <a class="navbar-brand" href="index.html">Flight</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="javascript:;">首页 <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="insurance.html">保险</a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button type="button" class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+
+<body>
+    <div class="container" style="margin-top: 10px;" align="center">
+        <div class="row">
+            <div class="breadcrumb" id="noExtension">
+                请先安装浏览器插件钱包 <a target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet">WebExtensionWallet</a> 以完成注册。
+                <br>
+            </div>
+            <div class="row col-md-12">
+                <div class="search_in col-md-2"><span class="search_in_content"></span>
+                    <select class="trackSelect col-md-6 form-control">
+                        <option value="routeSearch">航线</option>
+                        <!-- <option value="airlineSearch">商业航班</option> -->
+                    </select>
+                </div>
+                <div id="datepicker1 col-md-2">
+                    <div class="input-group date form_date" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                        <input class="form-control" name="date" type="text" value="" placeholder="选择航班日期" readonly>
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                    <input type="hidden" id="dtp_input2" value="" />
+                    <br/>
+                </div>
+                <div id="routeSearch" class="searchOption col-md-5 row">
+                    <div class="col-md-5">
+                        <select class="form-control" name="origin">
+                            <!-- <option value="">选择始发地</option> -->
+                        </select>
+                        <!-- <input name="origin" class="form-control" type="text" placeholder="始发地 (如: PEK)" title="始发地 (如: PEK)" aria-label="始发地" /> -->
+                    </div>
+                    <div class="route_swap col-md-1">
+                        <div class="header_swap "><img alt="Swap" src="https://e1.flightcdn.com/images/home_main/swap_icon.png" onclick="routeSwap()" /></div>
+                    </div>
+                    <div class="col-md-5">
+                        <!-- <input name="destination" class="form-control" type="text" placeholder="目的地  (如: KLAX)" title="目的地  (如: KLAX)" aria-label="目的地 " /> -->
+                        <select class="form-control" name="destination">
+                            <!-- <option value="">选择目的地</option> -->
+                        </select>
+                    </div>
+                </div>
+                <div id="airlineSearch" class="searchOption col-md-5 row hide">
+                    <div class="col-md-6">
+                        <input name="airline_name" class="form-control" type="text" title="航空公司(如: Air China)" aria-label="航空公司(如: Air China)" placeholder="航空公司 (如: Air China)" />
+                    </div>
+                    <div class="col-md-6">
+                        <input name="ident_suffix" class="form-control" type="text" title="航班号(如: 450)" aria-label="航班号(如: 450)" placeholder="航班号 (如: 450)" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <a href="javascript:;" class="btn btn-block btn-md btn-info searchBtn">航班搜索</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="flightDiv card border-info">
+        <!--         <div class="card-header row col-md-12">
+            <h5 class="col-md-2 offset-md-5">航班列表</h5>
+            <div class="col-md-3 offset-md-2">
+                <input type="text" class="form-control" id="filter" placeholder="Search in table">
+            </div>
+        </div> -->
+        <div class="card-body hide">
+            <table id="flightTable" class="footable table table-stripped" data-paging="true" data-paging-size="10">
+                <thead class="thead-light">
+                    <tr>
+                        <th>航班号</th>
+                        <th>出发机场</th>
+                        <th>到达机场</th>
+                        <th>起飞时间</th>
+                        <th>落地时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="footer">
+        <!-- <hr> -->
+        <center>
+            <div id="footer_middle"> 使用
+                <a href="https://nebulas.io/">星云链</a>驱动，<a href="https://incentive.nebulas.io/cn/signup.html?invite=yABFy">提交DAPP获得100NAS</a>
+            </div>
+        </center>
+    </div>
+    <div class="modal fade" id="policyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>购买飞机延误险</div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="policyForm" class="form-horizontal" autocomplete="off">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">保单号</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="key" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">航班号</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="flight" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">起飞地点</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="from" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">目的地点</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="to" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">起飞时间</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="planStart" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">到达时间</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="planEnd" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">保费(NAS)</label>
+                            <div class="col-sm-8">
+                                <input type="number" name="premium" class="form-control" />
+                                <label class="col-form-label rate">当前赔付率为，即保额=保费*赔付率</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                    <button id="purchaseBtn" type="button" class="btn btn-default">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src=lib/jquery-3.3.1.min.js></script>
+    <script src=lib/nebPay.js></script>
+    <script src=lib/bootstrap-4.0.0-dist/js/bootstrap.min.js></script>
+    <script src=lib/nebulas.js></script>
+    <script src=lib/footable/js/footable.min.js></script>
+    <script src=lib/datepicker/js/bootstrap-datetimepicker.js></script>
+    <script src=lib/select2/js/select2.min.js></script>
+    <script>
+    "use strict";
+    //to check if the extension is installed
+    //if the extension is installed, var "webExtensionWallet" will be injected in to web page
+    if (typeof(webExtensionWallet) === "undefined") {
+        //alert ("Extension wallet is not installed, please install it first.")
+
+    } else {
+        $("#noExtension").hide();
+    }
+
+    var dappAddress = "n1p4HkrwESwc4coAib3sn1HepzPskn2NSKo";
+    var nebulas = require("nebulas"),
+        Account = nebulas.Account;
+
+    var NebPay = require("nebpay"); //https://github.com/nebulasio/nebPay
+    var nebPay = new NebPay();
+    var serialNumber; //交易序列号
+    var intervalQuery; //定时查询交易结果
+    var rate; //赔付率
+
+    // 显示航班列表
+    $(".searchBtn").on('click', function() {
+        var formJson = {};
+        formJson.date = $('input[name=date]').val();
+        var track = $('.trackSelect').val();
+        if (track == "routeSearch") {
+            formJson.origin = $('select[name=origin]').val();
+            formJson.destination = $('select[name=destination]').val();
+        }
+        $.ajax({
+            url: "http://www.grouptech.cn:8080/flight",
+            type: 'POST',
+            timeout: 30000,
+            dataType: "json",
+            data: JSON.stringify(formJson),
+            contentType: "application/json; charset=utf-8",
+            crossDomain: true,
+            success: function(data) {
+                // 获取结果数据
+                var code = data.code;
+                if (code == 0) {
+                    $('#flightTable tbody').empty();
+                    var _tbody = "";
+                    var result = data.data;
+                    for (var i = 0; i < result.length; i++) {
+                        _tbody += "<tr>";
+                        _tbody += "<td>" + result[i].flight + "</td>";
+                        _tbody += "<td>" + result[i].from + "</td>";
+                        _tbody += "<td>" + result[i].to + "</td>";
+                        _tbody += "<td>" + result[i].planStart + "</td>";
+                        _tbody += "<td>" + result[i].planEnd + "</td>";
+                        _tbody += "<td>" + "<a class=\"btn btn-info\" href=\"javascript:;\" onclick=\"apply(this)\">延误险</i></a>" + "</td>";
+                        _tbody += "</tr>";
+                    }
+                    $('.card-body').removeClass('hide');
+                    $('#flightTable tbody').append(_tbody);
+                    $('#flightTable').footable();
+                } else {
+                    alert(data.message);
+                    $('.card-body').addClass('hide');
+                }
+            },
+            error: function() {
+                alert("搜索航班出错");
+                $('.card-body').addClass('hide');
+            }
+        });
+    });
+
+    $('.trackSelect').on('change', function() {
+        var selectVal = $(this).val();
+        $('.searchOption').addClass('hide');
+        $('#' + selectVal).removeClass('hide');
+        $('input[type=text]').val('');
+    });
+
+    function routeSwap() {
+        var origin = $('select[name=origin]').val();
+        var destination = $('select[name=destination]').val();
+        $('select[name=origin]').val(destination);
+        $('select[name=destination]').val(origin);
+        $('select[name=origin]').select2({
+            placeholder: "选择始发地",
+            allowClear: true
+        });
+        $('select[name=destination]').select2({
+            placeholder: "选择目的地",
+            allowClear: true
+        });
+    }
+
+    function apply(obj) {
+        var dialog = $("#policyModal");
+        dialog.modal('show');
+        var tds = $(obj).parents('tr').find('td');
+        $('input[name=key]').val('F' + new Date().getTime());
+        $('input[name=flight]').val($(tds.get(0)).text());
+        $('input[name=from]').val($(tds.get(1)).text());
+        $('input[name=to]').val($(tds.get(2)).text());
+        $('input[name=planStart]').val($(tds.get(3)).text());
+        $('input[name=planEnd]').val($(tds.get(4)).text());
+        $('.rate').html("当前赔付率为" + rate + "，即保额=保费*赔付率");
+    }
+
+    $('#purchaseBtn').on('click', function() {
+        var to = dappAddress;
+        var value = $('input[name=premium]').val();
+        var callFunction = "apply";
+        // args
+        var key = $('input[name=key]').val();
+        var flight = $('input[name=flight]').val();
+        var planStart = $('input[name=planStart]').val();
+        var planEnd = $('input[name=planEnd]').val();
+        var origin = $('input[name=from]').val();
+        var dest = $('input[name=to]').val();
+        var remarks = "";
+        // (key, flight, planStart, planEnd, from, to, remarks)
+        var callArgs = "[\"" + key + "\",\"" + flight + "\",\"" + planStart + "\",\"" + planEnd + "\",\"" + origin + "\",\"" + dest + "\",\"" + remarks + "\"]"
+
+        serialNumber = nebPay.call(to, value, callFunction, callArgs, { //使用nebpay的call接口去调用合约,
+            listener: cbPush //设置listener, 处理交易返回信息
+        });
+
+        intervalQuery = setInterval(function() {
+            funcIntervalQuery();
+        }, 5000);
+    });
+
+    function funcIntervalQuery() {
+        nebPay.queryPayInfo(serialNumber) //search transaction result from server (result upload to server by app)
+            .then(function(resp) {
+                console.log("tx result: " + resp) //resp is a JSON string
+                var respObject = JSON.parse(resp)
+                if (respObject.code === 0) {
+                    clearInterval(intervalQuery)
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    }
+
+    function cbPush(resp) {
+        console.log("response of push: " + JSON.stringify(resp))
+    }
+
+    $(document).ready(function() {
+        var datepicker1 = $('.form_date');
+        if (datepicker1 != "") {
+            datepicker1.datetimepicker({
+                weekStart: 1,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 2,
+                forceParse: 0
+            });
+        };
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "getRate"
+        var callArgs = "[\"" + "\"]"
+
+        nebPay.simulateCall(to, value, callFunction, callArgs, { //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: function(resp) {
+                var result = resp.result;
+                rate = result;
+            } //指定回调函数
+        });
+
+        // 添加下拉元素
+        $.ajax({
+            url: "http://www.grouptech.cn:8080/airport",
+            type: 'GET',
+            timeout: 30000,
+            dataType: "json",
+            success: function(res) {
+                var resultData = res.data;
+                // 结果数据展示
+                for (var key in resultData) {
+                    $('select[name=origin]').append(new Option(resultData[key], key))
+                    $('select[name=destination]').append(new Option(resultData[key], key))
+                    $('select[name=origin]').select2({
+                        placeholder: "选择始发地",
+                        allowClear: true
+                    });
+                    $('select[name=destination]').select2({
+                        placeholder: "选择目的地",
+                        allowClear: true
+                    });
+                }
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>

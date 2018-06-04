@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+    <title>Flight</title>
+    <link rel="stylesheet" href="lib/bootstrap-4.0.0-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/datepicker/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" href="lib/footable/css/footable.bootstrap.min.css">
+    <link rel="icon" href="flight.ico">
+    <style>
+    .hide {
+        display: none;
+    }
+
+    .footer {
+        left: 0px;
+        position: fixed;
+        width: 100%;
+        height: 100px;
+        text-align: center;
+        bottom: 0px;
+    }
+
+    .card {
+        margin: 10px;
+    }
+
+    .card-header {
+        margin-left: 2px;
+    }
+    </style>
+</head>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation">
+    <a class="navbar-brand" href="index.html">Flight</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">首页</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="javascript:;">保险 <span class="sr-only">(current)</a>
+            </li>
+            <li class="nav-item dropdown hide">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          管理员
+        </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item statBtn" href="javascript:;">统计</i></a>
+                    <a class="dropdown-item listBtn" href="javascript:;">理赔列表</i></a>
+                </div>
+            </li>
+<!--             <li class="nav-item">
+                <a class="nav-link statBtn" href="javascript:;">$</i></a>
+            </li> -->
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+            <button type="button" class="btn btn-outline-info my-2 my-sm-0" type="submit">Search</button>
+        </form>
+    </div>
+</nav>
+
+<body>
+    <div class="container" style="margin-top: 10px;" align="center">
+        <div class="row">
+            <div class="breadcrumb" id="noExtension">
+                请先安装浏览器插件钱包 <a target="_blank" href="https://github.com/ChengOrangeJu/WebExtensionWallet">WebExtensionWallet</a> 以完成注册。
+                <br>
+            </div>
+            <div class="row col-md-12">
+                <div class="searchOption col-md-7 offset-md-2 row">
+                    <div class="col-md-12">
+                        <input name="policy" id="policyNo" class="form-control" type="text" title="输入保单号" aria-label="输入保单号" placeholder="输入保单号" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <a href="javascript:;" class="btn btn-md btn-info policyBtn">保单搜索</a>
+                    <a href="javascript:;" class="btn btn-md btn-success myBtn hide" account="">我的保单</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="policyDiv card border-info">
+        <!--         <div class="card-header row col-md-12">
+            <h5 class="col-md-2 offset-md-5">航班列表</h5>
+            <div class="col-md-3 offset-md-2">
+                <input type="text" class="form-control" id="filter" placeholder="Search in table">
+            </div>
+        </div> -->
+        <div class="card-body">
+            <table id="policyTable" class="footable table table-stripped toggle-arrow-tiny" data-page-size="10" data-filter=#filter>
+                <thead class="thead-light">
+                    <tr>
+                        <th>保单号</th>
+                        <th>航班号</th>
+                        <th>用户</th>
+                        <th>保费(wei)</th>
+                        <th>保额(wei)</th>
+                        <th>起飞时间</th>
+                        <th>落地时间</th>
+                        <th>出发机场</th>
+                        <th>到达机场</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="footer">
+        <hr>
+        <center>
+            <div id="footer_middle"> 使用
+                <a href="https://nebulas.io/">星云链</a>驱动，<a href="https://incentive.nebulas.io/cn/signup.html?invite=yABFy">提交DAPP获得100NAS</a>
+            </div>
+        </center>
+    </div>
+    <div class="modal fade" id="statModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>合约统计</div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="newForm" class="form-horizontal" autocomplete="off">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">保单总数</label>
+                            <div class="col-sm-8">
+                                <input id="count" type="number" name="count" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">合约余额（wei）</label>
+                            <div class="col-sm-8">
+                                <input id="amount" type="number" name="amount" class="form-control" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                    <button id="transferBtn" type="button" class="btn btn-default">转账</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="checkModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>核赔</div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="newForm" class="form-horizontal" autocomplete="off">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">保单号</label>
+                            <div class="col-sm-8">
+                                <input type="text" name="key" class="form-control" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">实际起飞时间</label>
+                            <div class="col-sm-8 input-group date form_date" data-date="" data-date-format="yyyy-mm-dd hh:ii:ss" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                                <input class="form-control" name="actualStart" type="text" value="" placeholder="实际起飞时间" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">实际落地时间</label>
+                            <div class="col-sm-8 input-group date form_date" data-date="" data-date-format="yyyy-mm-dd hh:ii:ss" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd">
+                                <input class="form-control" name="actualEnd" type="text" value="" placeholder="实际落地时间" readonly>
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
+                    <button id="checkBtn" type="button" class="btn btn-default">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src=lib/jquery-3.3.1.min.js></script>
+    <script src=lib/nebPay.js></script>
+    <script src=lib/bootstrap-4.0.0-dist/js/bootstrap.min.js></script>
+    <script src=lib/nebulas.js></script>
+    <script src=lib/footable/js/footable.min.js></script>
+    <script src=lib/datepicker/js/bootstrap-datetimepicker.js></script>
+    <script>
+    "use strict";
+    //to check if the extension is installed
+    //if the extension is installed, var "webExtensionWallet" will be injected in to web page
+    if (typeof(webExtensionWallet) === "undefined") {
+        //alert ("Extension wallet is not installed, please install it first.")
+        $(".myBtn").hide();
+    } else {
+        $("#noExtension").hide();
+        $(".myBtn").removeClass("hide");
+    }
+
+    var dappAddress = "n1p4HkrwESwc4coAib3sn1HepzPskn2NSKo";
+    var nebulas = require("nebulas"),
+        Account = nebulas.Account;
+
+    var NebPay = require("nebpay"); //https://github.com/nebulasio/nebPay
+    var nebPay = new NebPay();
+    var serialNumber; //交易序列号
+    var intervalQuery; //定时查询交易结果
+
+    // 显示保单列表
+    $('.policyBtn').on('click', function() {
+        var policyNo = $("#policyNo").val();
+        if (policyNo == "") {
+            alert("保单号不能为空");
+            return;
+        }
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "get"
+        var callArgs = "[\"" + policyNo + "\"]"
+
+        nebPay.simulateCall(to, value, callFunction, callArgs, { //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: cbSingle //指定回调函数
+        });
+    });
+    //return of search,
+    function cbSingle(resp) {
+        var result = resp.result; ////resp is an object, resp.result is a JSON string
+        // console.log("return of rpc call: " + JSON.stringify(result))
+        if (typeof(result) === "undefined") {
+            alert(resp);
+        } else {
+            //if result is not null, then it should be "return value" or "error message"
+            try {
+                result = JSON.parse(result);
+                $('#policyTable tbody').empty();
+                var _tbody = tbodyParse(result);
+                $('.policyDiv').removeClass('hide');
+                $('#policyTable tbody').append(_tbody);
+                $('#policyTable').footable();
+            } catch (err) {
+                //result is the error message
+                alert(err);
+            }
+        }
+    }
+
+    function tbodyParse(result) {
+        var _tbody = "";
+        _tbody += "<tr>";
+        _tbody += "<td>" + result.key + "</td>";
+        _tbody += "<td>" + result.flight + "</td>";
+        _tbody += "<td>" + result.account + "</td>";
+        _tbody += "<td>" + result.premium + "</td>";
+        _tbody += "<td>" + result.amount + "</td>";
+        _tbody += "<td>" + result.planStart + "</td>";
+        _tbody += "<td>" + result.planEnd + "</td>";
+        _tbody += "<td>" + result.from + "</td>";
+        _tbody += "<td>" + result.to + "</td>";
+        _tbody += "<td>" + statusParse(result.status) + "</td>";
+        if (result.status == 0) {
+            _tbody += "<td>" + "<a class=\"btn btn-info\" href=\"javascript:;\" onclick=\"claim('" + result.key + "')\">理赔</a>" + "</td>";
+        } else if (result.status == 1 || result.status == -1) {
+            _tbody += "<td>" + "<a class=\"btn btn-info\" href=\"javascript:;\" onclick=\"check('" + result.key + "')\">核赔</a>" + "</td>";
+        }
+        _tbody += "</tr>";
+        return _tbody;
+    }
+
+    function statusParse(status) {
+        var result = ""; //0 已投保 1 理赔中 2 已理赔 3 已结案 -1 转账失败
+        switch (status) {
+            case 0:
+                result = "已投保";
+                break;
+            case 1:
+                result = "理赔中";
+                break;
+            case 2:
+                result = "已理赔";
+                break;
+            case 3:
+                result = "已结案";
+                break;
+            case -1:
+                result = "转账失败";
+                break;
+        }
+        return result;
+    }
+
+    $('.myBtn').on('click', function() {
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "getByAccount"
+        var callArgs = "[\"" + $(this).attr("account") + "\"]"
+
+        nebPay.simulateCall(to, value, callFunction, callArgs, { //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: cbSearch //指定回调函数
+        });
+    });
+    //return of search,
+    function cbSearch(resp) {
+        var result = resp.result ////resp is an object, resp.result is a JSON string
+        // console.log("return of rpc call: " + JSON.stringify(result))
+        if (typeof(result) === "undefined") {
+            alert(resp);
+        } else if (result === 'null' || result === '[]') {
+            alert("保单列表为空");
+        } else {
+            //if result is not null, then it should be "return value" or "error message"
+            try {
+                result = JSON.parse(result);
+                $('#policyTable tbody').empty();
+                var _tbody = "";
+                for (var i = 0; i < result.length; i++) {
+                    _tbody += tbodyParse(result[i]);
+                }
+                $('.policyDiv').removeClass('hide');
+                $('#policyTable tbody').append(_tbody);
+                $('#policyTable').footable();
+            } catch (err) {
+                //result is the error message
+                alert(err);
+            }
+        }
+    }
+
+    $('.listBtn').on('click', function() {
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "getByStatus"
+        var callArgs = "[\"" + "1" + "\"]"
+
+        nebPay.simulateCall(to, value, callFunction, callArgs, { //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: cbSearch //指定回调函数
+        });
+    });
+
+    function claim(key) {
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "claim";
+        // claim(key)
+        var callArgs = "[\"" + key + "\"]"
+
+        serialNumber = nebPay.call(to, value, callFunction, callArgs, { //使用nebpay的call接口去调用合约,
+            listener: cbPush //设置listener, 处理交易返回信息
+        });
+
+        intervalQuery = setInterval(function() {
+            funcIntervalQuery();
+        }, 5000);
+    }
+
+    function check(key) {
+        var dialog = $("#checkModal");
+        dialog.modal('show');
+        $('input[name=key]').val(key);
+    }
+
+    $('#checkBtn').on("click", function() {
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "check";
+        // args
+        var actualStart = $('input[name=actualStart]').val();
+        var actualEnd = $('input[name=actualEnd]').val();
+        // check(key, actualStart, actualEnd)
+        var callArgs = "[\"" + $('input[name=key]').val() + "\",\"" + actualStart + "\",\"" + actualEnd + "\"]"
+
+        serialNumber = nebPay.call(to, value, callFunction, callArgs, { //使用nebpay的call接口去调用合约,
+            listener: cbPush //设置listener, 处理交易返回信息
+        });
+
+        intervalQuery = setInterval(function() {
+            funcIntervalQuery();
+        }, 5000);
+
+    });
+
+    var HttpRequest = require("nebulas").HttpRequest;
+    var Neb = require("nebulas").Neb;
+    var neb = new Neb();
+    neb.setRequest(new HttpRequest("https://mainnet.nebulas.io"));
+    //
+    $(".statBtn").on("click", function() {
+        var dialog = $("#statModal");
+        dialog.modal('show');
+
+        neb.api.getAccountState(dappAddress).then(function(state) {
+            state = state.result || state;
+            $('#amount').val(state.balance);
+        }).catch(function(err) {
+            console.log("err:", err);
+        });
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "len"
+        var callArgs = "[\"" + "\"]"
+
+        nebPay.simulateCall(to, value, callFunction, callArgs, { //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: cbLen //指定回调函数
+        });
+    });
+
+    function cbLen(resp) {
+        var result = resp.result ////resp is an object, resp.result is a JSON string
+        //console.log("return of rpc call: " + JSON.stringify(result))
+
+        if (typeof(result) === "undefined") {
+            alert(resp);
+        } else {
+            $('#count').val(result);
+        }
+    }
+
+    $("#transferBtn").click(function() {
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "transfer";
+        var amount = $('#amount').val();
+        // transfer(amount)
+        var callArgs = "[\"" + amount + "\"]"
+
+        serialNumber = nebPay.call(to, value, callFunction, callArgs, { //使用nebpay的call接口去调用合约,
+            listener: cbPush //设置listener, 处理交易返回信息
+        });
+
+        intervalQuery = setInterval(function() {
+            funcIntervalQuery();
+        }, 5000);
+    });
+
+
+    function funcIntervalQuery() {
+        nebPay.queryPayInfo(serialNumber) //search transaction result from server (result upload to server by app)
+            .then(function(resp) {
+                console.log("tx result: " + resp) //resp is a JSON string
+                var respObject = JSON.parse(resp)
+                if (respObject.code === 0) {
+                    alert(`execute succeed!`)
+                    clearInterval(intervalQuery)
+                }
+            })
+            .catch(function(err) {
+                console.log(err);
+            });
+    }
+
+    function cbPush(resp) {
+        console.log("response of push: " + JSON.stringify(resp))
+    }
+
+    function addWallectInfo() {
+        window.postMessage({
+            "target": "contentscript",
+            "data": {},
+            "method": "getAccount",
+        }, "*");
+
+        window.addEventListener('message', function(e) {
+            if (e.data && e.data.data) {
+                if (e.data.data.account) {
+                    var address = e.data.data.account;
+                    $('.myBtn').attr("account", address);
+                }
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        addWallectInfo();
+
+        var datepicker1 = $('.form_date');
+        if (datepicker1 != "") {
+            datepicker1.datetimepicker({
+                weekStart: 1,
+                todayBtn: 1,
+                autoclose: 1,
+                todayHighlight: 1,
+                startView: 2,
+                minView: 0,
+                forceParse: 0
+            });
+        };
+
+        var to = dappAddress;
+        var value = "0";
+        var callFunction = "isAdmin"
+        var callArgs = "[\"" + "\"]"
+
+        nebPay.simulateCall(to, value, callFunction, callArgs, { //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+            listener: function(resp){
+                var result = resp.result;
+                if (result == "true"){
+                    $('.dropdown').removeClass('hide');
+                }
+            } //指定回调函数
+        });
+
+    });
+    </script>
+</body>
+
+</html>
